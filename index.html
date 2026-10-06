@@ -5,54 +5,102 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Filippo Nardoni</title>
   <meta name="description" content="Filippo Nardoni – PhD student in econometrics">
-  <link href="https://fonts.googleapis.com/css2?family=Tinos:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #fdfdfc; --text: #1f2328; --muted: #5f6670;
-      --accent: #1a5fb4; --line: #e3e5e8; --soft: #f3f4f6;
+      --bg: #fbfaf6; --text: #1c2126; --muted: #606873;
+      --accent: #1d4e89; --vol: #b5532a;
+      --line: #dfe1dc; --soft: #f1f0ea; --grid: rgba(28, 33, 38, 0.06);
+      --serif: "Times New Roman", Times, "Tinos", serif;
+      --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #16181c; --text: #e6e8eb; --muted: #9aa1ab;
-              --accent: #78aeff; --line: #2c3036; --soft: #1f2227; }
+      :root { --bg: #14171b; --text: #e4e6e9; --muted: #969ea8;
+              --accent: #7fb0f5; --vol: #e59467;
+              --line: #2a2f35; --soft: #1b1f24; --grid: rgba(228, 230, 233, 0.06); }
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0; background: var(--bg); color: var(--text);
-      font-family: "Times New Roman", Times, "Tinos", serif; font-size: 18px; line-height: 1.6;
+      font-family: var(--serif); font-size: 18px; line-height: 1.6;
     }
-    .wrap { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+    .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+    a { color: var(--accent); }
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+      outline: 2px solid var(--accent); outline-offset: 2px;
+    }
+
+    /* ---------- Navigation ---------- */
     nav { border-bottom: 1px solid var(--line); }
-    nav .wrap { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; flex-wrap: wrap; gap: 8px; }
+    nav .wrap { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; flex-wrap: wrap; gap: 8px; }
     nav .name { font-weight: 700; color: var(--text); text-decoration: none; }
     nav ul { list-style: none; display: flex; gap: 20px; margin: 0; padding: 0; flex-wrap: wrap; }
-    nav a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
-    nav a:hover { color: var(--accent); }
-    header { padding: 56px 0 24px; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
-    header img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
-    h1, h2, h3 { font-family: "Times New Roman", Times, "Tinos", serif; font-weight: 700; }
-    h1 { font-size: 2.2rem; margin: 0 0 4px; }
-    h2 { font-size: 1.4rem; margin: 48px 0 12px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+    nav ul a {
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none;
+    }
+    nav ul a:hover { color: var(--accent); }
+
+    /* ---------- Header ---------- */
+    header { padding: 52px 0 20px; display: flex; gap: 32px; align-items: center; flex-wrap: wrap; }
+    header img { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line); }
+    h1, h2, h3 { font-family: var(--serif); font-weight: 700; }
+    h1 { font-size: 2.3rem; line-height: 1.15; margin: 0 0 6px; }
     .role { color: var(--muted); margin: 0; }
-    .links { margin-top: 12px; display: flex; gap: 16px; flex-wrap: wrap; }
-    a { color: var(--accent); }
+    .links { margin-top: 12px; display: flex; gap: 18px; flex-wrap: wrap; font-family: var(--mono); font-size: 0.8rem; }
+
+    /* ---------- Simulated series ---------- */
+    .ts { margin: 12px 0 0; border: 1px solid var(--line); border-radius: 6px; background: var(--soft); overflow: hidden; }
+    .ts canvas { display: block; width: 100%; }
+    #ts-series { height: 190px; }
+    #ts-acf { height: 84px; border-top: 1px solid var(--line); }
+    .ts figcaption {
+      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px 20px; flex-wrap: wrap;
+      padding: 10px 14px; border-top: 1px solid var(--line); background: var(--bg);
+      font-family: var(--mono); font-size: 0.72rem; line-height: 1.7; color: var(--muted);
+    }
+    .ts figcaption p { margin: 0; flex: 1 1 320px; }
+    .ts .key-y { color: var(--accent); }
+    .ts .key-v { color: var(--vol); }
+    .ts button {
+      font: inherit; color: var(--text); background: transparent; cursor: pointer;
+      border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; white-space: nowrap;
+    }
+    .ts button:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ---------- Sections ---------- */
+    h2 { font-size: 1.4rem; margin: 52px 0 14px; }
+    /* axis with tick marks under each section heading */
+    h2::after {
+      content: ""; display: block; height: 6px; margin-top: 6px;
+      border-top: 1px solid var(--line);
+      background: repeating-linear-gradient(to right, var(--line) 0 1px, transparent 1px 16px);
+    }
+    h3 { font-size: 1.05rem; margin: 24px 0 8px; }
     .item { margin-bottom: 20px; }
     .item .title { font-weight: 700; }
-    .item .meta { color: var(--muted); font-size: 0.92rem; }
+    .item .meta, .course-meta, .note-meta { font-family: var(--mono); font-size: 0.74rem; color: var(--muted); }
+    .item p { margin: 6px 0 0; }
     .tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; }
-    .tags li { border: 1px solid var(--line); border-radius: 999px; padding: 2px 12px; font-size: 0.9rem; }
-    footer { margin: 64px 0 32px; color: var(--muted); font-size: 0.85rem; }
+    .tags li {
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.03em;
+      border: 1px solid var(--line); border-radius: 4px; padding: 2px 10px; color: var(--muted);
+    }
+    footer { margin: 64px 0 32px; color: var(--muted); font-family: var(--mono); font-size: 0.72rem; }
 
-    /* ---------- Notes section ---------- */
+    /* ---------- Notes ---------- */
     .notes-intro { color: var(--muted); margin-top: 0; }
     .notes-search {
       width: 100%; padding: 8px 12px; margin: 8px 0 20px;
-      font: inherit; font-size: 0.95rem; color: var(--text);
-      background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+      font-family: var(--mono); font-size: 0.82rem; color: var(--text);
+      background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
     }
-    .notes-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-    .course { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 12px; overflow: hidden; }
+    .course { border: 1px solid var(--line); border-radius: 6px; margin-bottom: 12px; overflow: hidden; }
     .course > summary {
-      cursor: pointer; list-style: none; padding: 12px 16px;
+      cursor: pointer; list-style: none; padding: 11px 16px;
       display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
       background: var(--soft); font-weight: 700;
     }
@@ -60,14 +108,19 @@
     .course > summary::before { content: "▸"; color: var(--muted); margin-right: 8px; transition: transform .15s; display: inline-block; }
     .course[open] > summary::before { transform: rotate(90deg); }
     .course > summary .course-name { flex: 1; }
-    .course > summary .course-meta { color: var(--muted); font-size: 0.85rem; font-weight: 400; white-space: nowrap; }
-    .note-list { list-style: none; margin: 0; padding: 4px 16px 8px; }
-    .note-list li { padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .course > summary .course-meta { font-weight: 400; white-space: nowrap; }
+    .note-list { list-style: none; margin: 0; padding: 2px 16px 6px; }
+    .note-list li {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+      padding: 9px 0; border-bottom: 1px solid var(--line);
+    }
     .note-list li:last-child { border-bottom: none; }
-    .note-title { font-weight: 700; }
-    .note-meta { color: var(--muted); font-size: 0.88rem; }
-    .note-meta a { margin-left: 4px; }
-    .notes-empty { color: var(--muted); display: none; }
+    .note-status { color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .course > summary::before { transition: none; }
+    }
   </style>
 </head>
 <body>
@@ -92,7 +145,7 @@
       <img src="photo.jpg" alt="Filippo Nardoni" onerror="this.style.display='none'">
       <div>
         <h1>Filippo Nardoni</h1>
-        <p class="role">PhD Student in Economics · Aarhus University ACE</p>
+        <p class="role">PhD Student in Economics · Aarhus University, ACE</p>
         <div class="links">
           <a href="mailto:filippo.nardoni@econ.au.dk">Email</a>
           <a href="cv.pdf">CV</a>
@@ -101,11 +154,29 @@
       </div>
     </header>
 
+    <!-- A fresh GARCH(1,1) path is simulated on every visit.
+         Change the parameters at the top of the first <script> below. -->
+    <figure class="ts">
+      <canvas id="ts-series" role="img" aria-label="A simulated GARCH(1,1) return series with its conditional volatility band"></canvas>
+      <canvas id="ts-acf" role="img" aria-label="Sample autocorrelation function of the squared series"></canvas>
+      <figcaption>
+        <p>
+          Simulated GARCH(1,1):
+          <span class="key-y">y<sub>t</sub></span> = σ<sub>t</sub>z<sub>t</sub>,
+          σ<sub>t</sub><sup>2</sup> = ω + αy<sub>t−1</sub><sup>2</sup> + βσ<sub>t−1</sub><sup>2</sup>,
+          <span id="ts-params"></span>.
+          Band: <span class="key-v">±2σ<sub>t</sub></span>.
+          Below: sample ACF of y<sub>t</sub><sup>2</sup>, dashed ±1.96/√T.
+        </p>
+        <button type="button" id="ts-redraw">Draw a new path</button>
+      </figcaption>
+    </figure>
+
     <section id="about">
       <h2>About</h2>
       <p>
-        I am a PhD student at Aarhus University ACE ~ Aarhus Center for Econometrics ~.
-        My research is in financial econometrics, machine learning  and bootstrap methods.
+        I am a PhD student at Aarhus University, ACE (Aarhus Center for Econometrics).
+        My research is in financial econometrics, machine learning and bootstrap methods.
       </p>
       <ul class="tags">
         <li>Bootstrap</li>
@@ -141,12 +212,18 @@
     </section>
 
     <!-- ================= NOTES =================
-         How to add notes:
-         1. Create a folder called "notes" in your repo and put your PDFs there
-            (e.g. notes/fin-econometrics-garch.pdf).
-         2. Copy one <li>…</li> block below and change title, date and file name.
-         3. For a new course, copy a whole <details class="course">…</details> block.
-         Add "open" to <details> if you want a course expanded by default. -->
+         This section fills itself. You never edit this HTML to add a note.
+
+         1. In the repo, make a folder called "notes".
+         2. Inside it, make one folder per course, e.g.
+              notes/Advanced-Financial-Econometrics/
+              notes/Macroeconometrics/
+         3. Upload PDFs into the course folders, e.g.
+              notes/Advanced-Financial-Econometrics/01-GARCH-models-and-QML.pdf
+
+         Folder name  -> course heading   (dashes/underscores become spaces)
+         File name    -> note title       (same; write capitals as you want them shown)
+         A leading number such as "01-" sets the order and is hidden. -->
     <section id="notes">
       <h2>Lecture Notes</h2>
       <p class="notes-intro">
@@ -158,59 +235,20 @@
              placeholder="Search notes (e.g. GARCH, bootstrap, cointegration)…"
              aria-label="Search notes">
 
-      <details class="course" open>
-        <summary>
-          <span class="course-name">Advanced Financial Econometrics</span>
-          <span class="course-meta">[University] · [Year]</span>
-        </summary>
-        <ul class="note-list">
-          <li>
-            <div class="note-title">[Topic, e.g. GARCH models and QML estimation]</div>
-            <div class="note-meta">[Month Year] · <a href="notes/[file-name].pdf">PDF</a></div>
-          </li>
-          <li>
-            <div class="note-title">[Topic, e.g. Multivariate GARCH and portfolio selection]</div>
-            <div class="note-meta">[Month Year] · <a href="notes/[file-name].pdf">PDF</a></div>
-          </li>
-        </ul>
-      </details>
-
-      <details class="course">
-        <summary>
-          <span class="course-name">Macroeconometrics</span>
-          <span class="course-meta">[University] · [Year]</span>
-        </summary>
-        <ul class="note-list">
-          <li>
-            <div class="note-title">[Topic, e.g. Cointegration and the VECM]</div>
-            <div class="note-meta">[Month Year] · <a href="notes/[file-name].pdf">PDF</a></div>
-          </li>
-        </ul>
-      </details>
-
-      <details class="course">
-        <summary>
-          <span class="course-name">Machine Learning</span>
-          <span class="course-meta">[University] · [Year]</span>
-        </summary>
-        <ul class="note-list">
-          <li>
-            <div class="note-title">[Topic, e.g. Lasso and high-dimensional regression]</div>
-            <div class="note-meta">[Month Year] · <a href="notes/[file-name].pdf">PDF</a></div>
-          </li>
-        </ul>
-      </details>
-
-      <p class="notes-empty" id="notes-empty">No notes match your search.</p>
+      <div id="notes-list" aria-live="polite">
+        <p class="note-status">Loading notes…</p>
+      </div>
+      <p class="note-status" id="notes-empty" hidden>No notes match your search.</p>
+      <noscript><p class="note-status">The notes are in the <a href="notes/">notes folder</a> of this site's repository.</p></noscript>
     </section>
 
     <section id="contact">
       <h2>Contact</h2>
       <p>
         Email: <a href="mailto:filippo.nardoni@econ.au.dk">filippo.nardoni@econ.au.dk</a><br>
-        Universitetsbyen 51
-        Building 1814 - 471
-        8000 Aarhus C
+        Universitetsbyen 51<br>
+        Building 1814 - 471<br>
+        8000 Aarhus C<br>
         Denmark
       </p>
     </section>
@@ -219,34 +257,279 @@
   </main>
 
   <script>
-    // Simple search over the notes: filters by note title and course name.
+    /* ---------- Simulated GARCH(1,1) path and ACF of squares ---------- */
     (function () {
+      var OMEGA = 0.05, ALPHA = 0.10, BETA = 0.85;   // need ALPHA + BETA < 1
+      var T = 400, BURN = 200, LAGS = 20;
+
+      var cs = document.getElementById('ts-series');
+      var ca = document.getElementById('ts-acf');
+      if (!cs || !cs.getContext) return;
+      document.getElementById('ts-params').textContent =
+        '(ω, α, β) = (' + OMEGA.toFixed(2) + ', ' + ALPHA.toFixed(2) + ', ' + BETA.toFixed(2) + '), T = ' + T;
+
+      var y, sig, rho, shown = T, raf = null;
+      var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      function randn() {                      // Box–Muller
+        var u = 0, v = 0;
+        while (!u) u = Math.random();
+        while (!v) v = Math.random();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      function simulate() {
+        y = []; sig = [];
+        var s2 = OMEGA / (1 - ALPHA - BETA), prev = 0;   // start at unconditional variance
+        for (var t = 0; t < BURN + T; t++) {
+          s2 = OMEGA + ALPHA * prev * prev + BETA * s2;
+          var s = Math.sqrt(s2);
+          prev = s * randn();
+          if (t >= BURN) { y.push(prev); sig.push(s); }
+        }
+        // sample ACF of y^2
+        var q = y.map(function (v) { return v * v; });
+        var m = q.reduce(function (a, b) { return a + b; }, 0) / T, g0 = 0, k, i;
+        for (i = 0; i < T; i++) g0 += (q[i] - m) * (q[i] - m);
+        rho = [];
+        for (k = 1; k <= LAGS; k++) {
+          var g = 0;
+          for (i = k; i < T; i++) g += (q[i] - m) * (q[i - k] - m);
+          rho.push(g / g0);
+        }
+      }
+
+      function css(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      }
+
+      function prep(c) {
+        var dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+        c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+        var g = c.getContext('2d');
+        g.setTransform(dpr, 0, 0, dpr, 0, 0);
+        g.clearRect(0, 0, w, h);
+        g.font = '10px ' + css('--mono');
+        return { g: g, w: w, h: h };
+      }
+
+      function drawSeries(n) {
+        var p = prep(cs), g = p.g, w = p.w, h = p.h, padX = 14, padY = 12, i;
+        var top = 0;
+        for (i = 0; i < T; i++) top = Math.max(top, Math.abs(y[i]), 2 * sig[i]);
+        top *= 1.08;
+        function X(t) { return padX + (w - 2 * padX) * t / (T - 1); }
+        function Y(v) { return h / 2 - (h / 2 - padY) * v / top; }
+
+        // grid
+        g.strokeStyle = css('--grid'); g.lineWidth = 1;
+        for (i = 0; i <= 8; i++) {
+          var gx = Math.round(X(i * (T - 1) / 8)) + 0.5;
+          g.beginPath(); g.moveTo(gx, 0); g.lineTo(gx, h); g.stroke();
+        }
+        g.strokeStyle = css('--line');
+        g.beginPath(); g.moveTo(0, Math.round(h / 2) + 0.5); g.lineTo(w, Math.round(h / 2) + 0.5); g.stroke();
+
+        // +/- 2 sigma band
+        g.beginPath();
+        for (i = 0; i < n; i++) g.lineTo(X(i), Y(2 * sig[i]));
+        for (i = n - 1; i >= 0; i--) g.lineTo(X(i), Y(-2 * sig[i]));
+        g.closePath();
+        g.globalAlpha = 0.13; g.fillStyle = css('--vol'); g.fill(); g.globalAlpha = 1;
+        g.strokeStyle = css('--vol'); g.lineWidth = 1; g.globalAlpha = 0.7;
+        [1, -1].forEach(function (s) {
+          g.beginPath();
+          for (i = 0; i < n; i++) g.lineTo(X(i), Y(s * 2 * sig[i]));
+          g.stroke();
+        });
+        g.globalAlpha = 1;
+
+        // series
+        g.strokeStyle = css('--accent'); g.lineWidth = 1.1; g.lineJoin = 'round';
+        g.beginPath();
+        for (i = 0; i < n; i++) g.lineTo(X(i), Y(y[i]));
+        g.stroke();
+
+        g.fillStyle = css('--muted');
+        g.textAlign = 'right'; g.fillText('t = ' + T, w - 8, h - 7);
+        g.textAlign = 'left';  g.fillText('y_t', 8, 14);
+      }
+
+      function drawAcf() {
+        var p = prep(ca), g = p.g, w = p.w, h = p.h, padX = 14, k;
+        var band = 1.96 / Math.sqrt(T);
+        var hi = Math.max(0.3, Math.max.apply(null, rho)) * 1.15;
+        var lo = Math.min(-band * 1.6, Math.min.apply(null, rho) * 1.15);
+        function Y(v) { return 8 + (h - 16) * (hi - v) / (hi - lo); }
+        function X(lag) { return padX + 34 + (w - 2 * padX - 50) * (lag - 1) / (LAGS - 1); }
+
+        g.strokeStyle = css('--line'); g.lineWidth = 1;
+        g.beginPath(); g.moveTo(0, Math.round(Y(0)) + 0.5); g.lineTo(w, Math.round(Y(0)) + 0.5); g.stroke();
+
+        g.setLineDash([4, 4]); g.strokeStyle = css('--muted'); g.globalAlpha = 0.6;
+        [band, -band].forEach(function (b) {
+          g.beginPath(); g.moveTo(padX + 26, Y(b)); g.lineTo(w - padX, Y(b)); g.stroke();
+        });
+        g.setLineDash([]); g.globalAlpha = 1;
+
+        g.strokeStyle = css('--accent'); g.fillStyle = css('--accent'); g.lineWidth = 2;
+        for (k = 1; k <= LAGS; k++) {
+          g.beginPath(); g.moveTo(X(k), Y(0)); g.lineTo(X(k), Y(rho[k - 1])); g.stroke();
+          g.beginPath(); g.arc(X(k), Y(rho[k - 1]), 2.2, 0, 2 * Math.PI); g.fill();
+        }
+
+        g.fillStyle = css('--muted');
+        g.textAlign = 'left';  g.fillText('ACF', 8, 14);
+        g.textAlign = 'right'; g.fillText('lag ' + LAGS, w - 8, h - 7);
+      }
+
+      function render() { drawSeries(shown); drawAcf(); }
+
+      function run() {
+        if (raf) cancelAnimationFrame(raf);
+        simulate();
+        if (still) { shown = T; render(); return; }
+        var start = null, dur = 1400;
+        (function step(ts) {
+          if (start === null) start = ts || performance.now();
+          var f = Math.min(1, ((ts || start) - start) / dur);
+          shown = Math.max(2, Math.round(T * (1 - Math.pow(1 - f, 3))));
+          render();
+          raf = f < 1 ? requestAnimationFrame(step) : null;
+        })();
+      }
+
+      document.getElementById('ts-redraw').addEventListener('click', run);
+      window.addEventListener('resize', render);
+      if (window.matchMedia) {
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        if (mq.addEventListener) mq.addEventListener('change', render);
+      }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(render);
+      run();
+    })();
+
+    /* ---------- Notes: list every PDF under notes/ in the repo ---------- */
+    (function () {
+      // Used when the page is not opened from <username>.github.io (e.g. previewed locally).
+      var OWNER = 'Filnard13', REPO = 'Filnard13.github.io', FOLDER = 'notes';
+
+      var host = location.hostname;
+      if (/\.github\.io$/.test(host)) { OWNER = host.split('.')[0]; REPO = host; }
+
+      var list = document.getElementById('notes-list');
       var input = document.getElementById('notes-search');
       var empty = document.getElementById('notes-empty');
-      var courses = document.querySelectorAll('#notes .course');
-      if (!input) return;
+      if (!list) return;
+      var CACHE = 'notes-tree-v1', TTL = 5 * 60 * 1000;
 
-      input.addEventListener('input', function () {
-        var q = input.value.trim().toLowerCase();
-        var anyVisible = false;
+      function pretty(name) {
+        return name.replace(/\.pdf$/i, '').replace(/^\d+[-_. ]+/, '').replace(/[-_]+/g, ' ').trim();
+      }
+      function byName(a, b) {
+        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+      }
+      function el(tag, cls, text) {
+        var e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text != null) e.textContent = text;
+        return e;
+      }
+      function status(text, linkText, href) {
+        list.textContent = '';
+        var p = el('p', 'note-status', text);
+        if (href) { var a = el('a', null, linkText); a.href = href; p.appendChild(a); }
+        list.appendChild(p);
+      }
 
-        courses.forEach(function (course) {
-          var courseName = course.querySelector('.course-name').textContent.toLowerCase();
-          var items = course.querySelectorAll('.note-list li');
-          var matches = 0;
+      function fetchPaths() {
+        try {
+          var c = JSON.parse(sessionStorage.getItem(CACHE));
+          if (c && Date.now() - c.at < TTL) return Promise.resolve(c.paths);
+        } catch (e) {}
+        var refs = ['HEAD', 'main', 'master'];
+        function attempt(i) {
+          return fetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/git/trees/' + refs[i] + '?recursive=1')
+            .then(function (r) {
+              if (r.ok) return r.json();
+              if (i + 1 < refs.length) return attempt(i + 1);
+              throw new Error('GitHub API ' + r.status);
+            });
+        }
+        return attempt(0).then(function (data) {
+          var paths = (data.tree || [])
+            .filter(function (n) {
+              return n.type === 'blob' && n.path.indexOf(FOLDER + '/') === 0 && /\.pdf$/i.test(n.path);
+            })
+            .map(function (n) { return n.path; });
+          try { sessionStorage.setItem(CACHE, JSON.stringify({ at: Date.now(), paths: paths })); } catch (e) {}
+          return paths;
+        });
+      }
 
-          items.forEach(function (li) {
-            var hit = !q || courseName.includes(q) || li.textContent.toLowerCase().includes(q);
-            li.style.display = hit ? '' : 'none';
-            if (hit) matches++;
-          });
-
-          course.style.display = matches ? '' : 'none';
-          if (q && matches) course.open = true;   // expand courses with results
-          if (matches) anyVisible = true;
+      function render(paths) {
+        if (!paths.length) {
+          status('No notes yet. PDFs uploaded to the ' + FOLDER + '/ folder of the repository appear here automatically.');
+          return;
+        }
+        var groups = {};
+        paths.forEach(function (p) {
+          var parts = p.split('/').slice(1);
+          var course = parts.length > 1 ? parts[0] : 'General';
+          (groups[course] = groups[course] || []).push(p);
         });
 
-        empty.style.display = anyVisible ? 'none' : 'block';
+        list.textContent = '';
+        Object.keys(groups).sort(byName).forEach(function (course, idx) {
+          var files = groups[course].sort(byName);
+          var d = el('details', 'course');
+          if (idx === 0) d.open = true;
+          var s = el('summary');
+          s.appendChild(el('span', 'course-name', pretty(course)));
+          s.appendChild(el('span', 'course-meta', files.length + (files.length === 1 ? ' note' : ' notes')));
+          d.appendChild(s);
+
+          var ul = el('ul', 'note-list');
+          files.forEach(function (p) {
+            var li = el('li');
+            li.appendChild(el('span', 'note-title', pretty(p.split('/').pop())));
+            var meta = el('span', 'note-meta');
+            var a = el('a', null, 'PDF');
+            a.href = p.split('/').map(encodeURIComponent).join('/');
+            meta.appendChild(a);
+            li.appendChild(meta);
+            ul.appendChild(li);
+          });
+          d.appendChild(ul);
+          list.appendChild(d);
+        });
+        filter();
+      }
+
+      // Search: filters by note title and course name.
+      function filter() {
+        var courses = list.querySelectorAll('.course');
+        if (!courses.length) { empty.hidden = true; return; }
+        var q = input.value.trim().toLowerCase(), any = false;
+        courses.forEach(function (course) {
+          var name = course.querySelector('.course-name').textContent.toLowerCase();
+          var n = 0;
+          course.querySelectorAll('.note-list li').forEach(function (li) {
+            var hit = !q || name.indexOf(q) !== -1 || li.textContent.toLowerCase().indexOf(q) !== -1;
+            li.style.display = hit ? '' : 'none';
+            if (hit) n++;
+          });
+          course.style.display = n ? '' : 'none';
+          if (q && n) course.open = true;
+          if (n) any = true;
+        });
+        empty.hidden = any;
+      }
+      if (input) input.addEventListener('input', filter);
+
+      fetchPaths().then(render).catch(function () {
+        status('The list could not be loaded right now. ', 'Browse the notes on GitHub',
+               'https://github.com/' + OWNER + '/' + REPO + '/tree/HEAD/' + FOLDER);
       });
     })();
   </script>
