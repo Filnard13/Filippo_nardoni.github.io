@@ -9,26 +9,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Tinos:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
-
     :root {
       --bg: #fbfaf6; --text: #1c2126; --muted: #606873;
       --accent: #1d4e89; --vol: #b5532a;
       --line: #dfe1dc; --soft: #f1f0ea; --grid: rgba(28, 33, 38, 0.06);
       --serif: "Times New Roman", Times, "Tinos", serif;
-      color-scheme: light dark;
-      --bg: #faf9f6; --paper: #fffefa; --text: #202a30; --muted: #667175;
-      --accent: #285f61; --vol: #b67853; --line: #dedfd7; --soft: #f0f1eb;
-      --grid: rgba(32, 42, 48, .065);
-      --serif: "Tinos", "Times New Roman", Times, serif;
       --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
     @media (prefers-color-scheme: dark) {
       :root { --bg: #14171b; --text: #e4e6e9; --muted: #969ea8;
               --accent: #7fb0f5; --vol: #e59467;
               --line: #2a2f35; --soft: #1b1f24; --grid: rgba(228, 230, 233, 0.06); }
-      :root { --bg: #171d20; --paper: #1c2326; --text: #e6e9e3; --muted: #a3b0ad;
-        --accent: #99c8bd; --vol: #d7a27b; --line: #35413f; --soft: #212b2c; --grid: rgba(230,233,227,.07); }
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -43,17 +34,6 @@
     }
 
     /* ---------- Navigation ---------- */
-    [hidden] { display: none !important; }
-    html { scroll-behavior: smooth; scroll-padding-top: 30px; }
-    body { margin: 0; background: var(--bg); color: var(--text); font: 19px/1.7 var(--serif); -webkit-font-smoothing: antialiased; }
-    .wrap { width: min(100%, 1140px); margin: 0 auto; padding-inline: 36px; }
-    a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 4px; }
-    a:hover { text-decoration-color: var(--accent); }
-    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
-    button, input { font: inherit; }
-    button { cursor: pointer; }
-    .skip-link { position: absolute; top: -80px; left: 20px; padding: 8px 14px; background: var(--paper); z-index: 5; }
-    .skip-link:focus { top: 12px; }
     nav { border-bottom: 1px solid var(--line); }
     nav .wrap { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; flex-wrap: wrap; gap: 8px; }
     nav .name { font-weight: 700; color: var(--text); text-decoration: none; }
@@ -62,10 +42,6 @@
       font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
       color: var(--muted); text-decoration: none;
     }
-    nav .wrap { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 82px; }
-    nav .name { font-size: 20px; font-weight: 700; color: var(--text); text-decoration: none; }
-    nav ul { display: flex; flex-wrap: wrap; gap: 23px; list-style: none; margin: 0; padding: 0; }
-    nav ul a { font: 11px/1.5 var(--mono); letter-spacing: .045em; text-transform: uppercase; text-decoration: none; color: var(--muted); }
     nav ul a:hover { color: var(--accent); }
 
     /* ---------- Header ---------- */
@@ -78,46 +54,6 @@
 
     /* ---------- Simulated series ---------- */
     .ts { margin: 12px 0 0; border: 1px solid var(--line); border-radius: 6px; background: var(--soft); overflow: hidden; }
-    .hero { display: grid; grid-template-columns: minmax(0, 1fr) 300px; align-items: center; gap: 88px; padding: 72px 0 64px; }
-    .eyebrow { font: 10px/1.7 var(--mono); letter-spacing: .13em; text-transform: uppercase; color: var(--accent); margin: 0 0 20px; }
-    h1, h2, h3 { font-family: var(--serif); }
-    h1 { font-weight: 400; font-size: clamp(48px, 5.6vw, 72px); line-height: 1.04; letter-spacing: -.045em; margin: 0 0 22px; }
-    .role { font: 16px/1.7 var(--sans); margin: 0; color: var(--muted); max-width: 430px; }
-    .role strong { font-weight: 500; color: var(--text); }
-    .hero-intro { max-width: 480px; margin: 22px 0 0; font-size: 22px; line-height: 1.55; }
-    .links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
-    .links a { display: inline-flex; align-items: center; gap: 12px; padding: 7px 14px; border: 1px solid var(--line); font: 11px/1.8 var(--mono); text-decoration: none; }
-    .links a:first-child { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-    .links a:hover { border-color: var(--accent); }
-    .portrait { margin: 0; }
-    .portrait-frame { position: relative; width: 100%; aspect-ratio: 15 / 17; background: var(--soft); border-radius: 3px; overflow: hidden; border: 1px solid var(--line); }
-    .portrait-frame img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center 35%; }
-    .portrait-fallback { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; color: var(--muted); font: 80px var(--serif); }
-    .portrait figcaption { margin-top: 12px; font: 10px/1.6 var(--mono); letter-spacing: .04em; color: var(--muted); }
-    .body-grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 88px; align-items: start; border-top: 1px solid var(--line); }
-    .content-column { min-width: 0; }
-    section { padding: 37px 0 39px; border-bottom: 1px solid var(--line); scroll-margin-top: 20px; }
-    section:last-child { border-bottom: 0; }
-    h2 { font-size: 29px; font-weight: 400; letter-spacing: -.025em; line-height: 1.3; margin: 0 0 22px; display: flex; align-items: baseline; gap: 16px; }
-    .section-number { font: 10px var(--mono); color: var(--accent); letter-spacing: .03em; }
-    h3 { font: 10px/1.7 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 27px 0 15px; }
-    p { margin: 0 0 17px; }
-    section p:last-child { margin-bottom: 0; }
-    .tags { display: flex; flex-wrap: wrap; gap: 7px 17px; list-style: none; margin: 25px 0 0; padding: 0; }
-    .tags li { font: 10px/1.8 var(--mono); color: var(--muted); }
-    .tags li::before { content: "·"; color: var(--accent); margin-right: 7px; }
-    .item { margin-bottom: 22px; padding-left: 16px; border-left: 2px solid var(--line); }
-    .item:last-child { margin-bottom: 0; }
-    .item .title { font-size: 20px; font-weight: 700; line-height: 1.45; }
-    .item .meta { margin-top: 5px; font: 11px/1.9 var(--mono); color: var(--muted); }
-    .item p { margin: 9px 0 0; font-size: 17px; color: var(--muted); }
-    .sidebar { padding-top: 39px; position: sticky; top: 30px; min-width: 0; }
-    .sidebar .eyebrow { color: var(--muted); margin-bottom: 14px; }
-    .ts { margin: 0; border: 1px solid var(--line); background: var(--paper); border-radius: 4px; overflow: hidden; }
-    .ts-heading { padding: 15px 16px 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .ts-heading h2 { display: block; margin: 0; font-size: 19px; letter-spacing: -.02em; }
-    .ts button { background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 3px; padding: 5px 7px; font: 10px/1.5 var(--mono); }
-    .ts button:hover { border-color: var(--accent); }
     .ts canvas { display: block; width: 100%; }
     #ts-series { height: 190px; }
     #ts-acf { height: 84px; border-top: 1px solid var(--line); }
@@ -168,29 +104,6 @@
       display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
       background: var(--soft); font-weight: 700;
     }
-    #ts-series { height: 128px; }
-    #ts-acf { height: 68px; border-top: 1px solid var(--line); }
-    .ts figcaption { padding: 13px 16px 16px; border-top: 1px solid var(--line); font: 10px/1.8 var(--mono); color: var(--muted); }
-    .chart-legend { display: flex; gap: 16px; margin: 0 0 9px; }
-    .key-y { color: var(--accent); }
-    .key-v { color: var(--vol); }
-    .ts figcaption p { margin: 0 0 10px; }
-    .model-details { border-top: 1px solid var(--line); padding-top: 9px; }
-    .model-details summary { cursor: pointer; color: var(--text); }
-    .model-details p { margin: 9px 0 0 !important; overflow-wrap: anywhere; }
-    .sidebar-note { margin: 16px 0 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
-    .notes-intro { color: var(--muted); font-size: 17px; }
-    .notes-controls { display: flex; align-items: stretch; flex-wrap: wrap; gap: 8px; margin: 23px 0 10px; }
-    .notes-search { min-width: 0; flex: 1 1 230px; width: 100%; padding: 11px 12px; color: var(--text); background: var(--paper); border: 1px solid var(--line); border-radius: 3px; font: 11px/1.7 var(--mono); }
-    .notes-search::placeholder { color: var(--muted); opacity: 1; }
-    .notes-refresh { border: 1px solid var(--line); border-radius: 3px; padding: 10px 12px; background: var(--soft); color: var(--text); font: 10px/1.7 var(--mono); }
-    .notes-refresh:hover { border-color: var(--accent); }
-    .notes-refresh:disabled { cursor: wait; opacity: .6; }
-    .note-status { font: 10px/1.9 var(--mono); color: var(--muted); }
-    #notes-count { margin: 0 0 17px; }
-    #notes-count:empty { display: none; }
-    .course { border: 1px solid var(--line); border-radius: 3px; margin-bottom: 12px; overflow: hidden; background: var(--paper); }
-    .course > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 10px; padding: 14px 16px; background: var(--soft); font-size: 18px; }
     .course > summary::-webkit-details-marker { display: none; }
     .course > summary::before { content: "▸"; color: var(--muted); margin-right: 8px; transition: transform .15s; display: inline-block; }
     .course[open] > summary::before { transform: rotate(90deg); }
@@ -200,23 +113,6 @@
     .note-list li {
       display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
       padding: 9px 0; border-bottom: 1px solid var(--line);
-    .course > summary::before { content: "+"; color: var(--accent); font: 14px var(--mono); }
-    .course[open] > summary::before { content: "−"; }
-    .course-name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
-    .course-meta, .note-meta { flex-shrink: 0; font: 10px/1.6 var(--mono); color: var(--muted); }
-    .note-list { list-style: none; margin: 0; padding: 0 16px; }
-    .note-list li { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 15px 0; border-bottom: 1px solid var(--line); }
-    .note-list li:last-child { border: 0; }
-    .note-title { font-size: 17px; line-height: 1.5; text-decoration: none; overflow-wrap: anywhere; }
-    .note-title:hover { text-decoration: underline; }
-    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .contact-label { display: block; margin-bottom: 6px; font: 10px var(--mono); color: var(--muted); }
-    .contact-grid p { font-size: 16px; }
-    .contact-grid a { overflow-wrap: anywhere; }
-    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-top: 1px solid var(--line); padding: 24px 0 30px; margin-top: 25px; font: 10px/1.8 var(--mono); color: var(--muted); }
-    footer a { text-decoration: none; }
-    @media (max-width: 1000px) {
-      .hero, .body-grid { grid-template-columns: minmax(0, 1fr) 270px; gap: 45px; }
     }
     .note-list li:last-child { border-bottom: none; }
     .note-status { color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
@@ -224,22 +120,6 @@
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
       .course > summary::before { transition: none; }
-    @media (max-width: 760px) {
-      .wrap { padding-inline: 24px; }
-      nav .wrap { flex-direction: column; align-items: flex-start; justify-content: center; gap: 9px; padding-block: 17px; }
-      nav ul { gap: 18px; }
-      nav ul a { font-size: 10px; }
-      .hero { grid-template-columns: minmax(0, 1fr) 210px; gap: 30px; padding: 45px 0; }
-      h1 { font-size: 50px; }
-      .hero-intro { font-size: 19px; }
-      .role { font-size: 14px; }
-      .hero .eyebrow { font-size: 9px; margin-bottom: 14px; }
-      .links { gap: 7px; margin-top: 23px; }
-      .links a { padding: 6px 10px; font-size: 10px; }
-      .body-grid { display: block; }
-      .sidebar { position: static; padding: 28px 0 35px; border-top: 1px solid var(--line); }
-      .sidebar-inner { max-width: 400px; }
-      #ts-series { height: 150px; }
     }
 
     /* Notes controls and narrow-screen layout */
@@ -250,18 +130,6 @@
       font-family: var(--mono); font-size: 0.76rem; line-height: 1.6;
       padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px;
       color: var(--text); background: var(--soft); cursor: pointer;
-    @media (max-width: 520px) {
-      .hero { grid-template-columns: 1fr; gap: 30px; padding-top: 36px; }
-      h1 { font-size: 56px; }
-      .hero-intro { max-width: 360px; }
-      .portrait { width: min(100%, 280px); }
-      .portrait-frame { aspect-ratio: 1 / 1; }
-      .portrait figcaption { font-size: 9px; }
-      section { padding: 30px 0; }
-      h2 { font-size: 27px; }
-      .contact-grid { grid-template-columns: 1fr; gap: 8px; }
-      .course > summary { flex-wrap: wrap; }
-      .course-meta { margin-left: auto; }
     }
     .notes-refresh:hover { border-color: var(--accent); color: var(--accent); }
     .notes-refresh:disabled { opacity: 0.6; cursor: wait; }
@@ -274,11 +142,9 @@
       .course > summary .course-name { flex-basis: 65%; }
       .course > summary .course-meta { margin-left: 22px; }
     }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#about">Skip to content</a>
 
   <nav>
     <div class="wrap">
@@ -301,29 +167,12 @@
       <div>
         <h1>Filippo Nardoni</h1>
         <p class="role">PhD Student in Economics · Aarhus University, ACE</p>
-    <header class="hero" id="top">
-      <div class="hero-copy">
-        <p class="eyebrow">Econometrics · Aarhus University</p>
-        <h1>Filippo<br>Nardoni<span style="color:var(--accent)">.</span></h1>
-        <p class="role"><strong>PhD Student in Economics</strong><br>Aarhus Center for Econometrics (ACE)</p>
-        <p class="hero-intro">Financial econometrics, machine learning, and bootstrap methods.</p>
         <div class="links">
           <a href="mailto:filippo.nardoni@econ.au.dk">Email</a>
           <a href="cv.pdf">CV</a>
           <a href="https://github.com/Filnard13">GitHub</a>
-          <a href="mailto:filippo.nardoni@econ.au.dk">Get in touch <span aria-hidden="true">↗</span></a>
-          <a href="cv.pdf">CV <span aria-hidden="true">↗</span></a>
-          <a href="https://github.com/Filnard13">GitHub <span aria-hidden="true">↗</span></a>
         </div>
       </div>
-      <figure class="portrait">
-        <div class="portrait-frame">
-          <img src="photo.jpg" alt="Filippo Nardoni" width="600" height="680" fetchpriority="high"
-               onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
-          <span class="portrait-fallback" hidden aria-label="Filippo Nardoni initials">FN</span>
-        </div>
-        <figcaption>Aarhus University · Denmark</figcaption>
-      </figure>
     </header>
 
     <!-- A fresh GARCH(1,1) path is simulated on every visit.
@@ -344,11 +193,8 @@
       </figcaption>
     </figure>
 
-    <div class="body-grid">
-      <div class="content-column">
     <section id="about">
       <h2>About</h2>
-      <h2><span class="section-number">01</span>About</h2>
       <p>
         I am a PhD student at Aarhus University, ACE (Aarhus Center for Econometrics).
         My research is in financial econometrics, machine learning and bootstrap methods.
@@ -363,7 +209,6 @@
 
     <section id="research">
       <h2>Research</h2>
-      <h2><span class="section-number">02</span>Research</h2>
 
       <h3>Working Papers</h3>
       <div class="item">
@@ -381,7 +226,6 @@
 
     <section id="teaching">
       <h2>Teaching</h2>
-      <h2><span class="section-number">03</span>Teaching</h2>
       <div class="item">
         <div class="title">[Course name]</div>
         <div class="meta">Teaching Assistant · [Semester, Year]</div>
@@ -395,7 +239,6 @@
          Configure exclusions and optional title overrides in the Notes script. -->
     <section id="notes">
       <h2>Lecture Notes</h2>
-      <h2><span class="section-number">04</span>Lecture Notes</h2>
       <p class="notes-intro">
         Notes I have taken during my studies. They are personal study notes and may contain errors;
         corrections are welcome by email.
@@ -404,7 +247,6 @@
       <div class="notes-controls">
         <input class="notes-search" type="search" id="notes-search"
                placeholder="Search notes (e.g. GARCH, bootstrap, cointegration)…"
-               placeholder="Search by topic or course…"
                aria-label="Search notes" aria-controls="notes-list" autocomplete="off">
         <button class="notes-refresh" type="button" id="notes-refresh" aria-controls="notes-list">Refresh notes</button>
       </div>
@@ -426,43 +268,9 @@
         8000 Aarhus C<br>
         Denmark
       </p>
-      <h2><span class="section-number">05</span>Contact</h2>
-      <div class="contact-grid">
-        <p><span class="contact-label">EMAIL</span><a href="mailto:filippo.nardoni@econ.au.dk">filippo.nardoni@econ.au.dk</a></p>
-        <p><span class="contact-label">OFFICE</span>Universitetsbyen 51<br>Building 1814 - 471<br>8000 Aarhus C, Denmark</p>
-      </div>
     </section>
 
     <footer>© 2026 Filippo Nardoni</footer>
-      </div>
-      <aside class="sidebar" aria-label="Interactive econometrics illustration">
-        <div class="sidebar-inner">
-          <p class="eyebrow">From the notebook</p>
-          <!-- A fresh simulated path is drawn on every visit. -->
-          <figure class="ts">
-            <div class="ts-heading">
-              <h2>Volatility in motion</h2>
-              <button type="button" id="ts-redraw" aria-label="Draw a new GARCH path">↻ New path</button>
-            </div>
-            <canvas id="ts-series" role="img" aria-label="Simulated GARCH returns with a band of plus or minus two conditional standard deviations"></canvas>
-            <canvas id="ts-acf" role="img" aria-label="Sample autocorrelation of squared returns"></canvas>
-            <figcaption>
-              <div class="chart-legend"><span class="key-y">— Returns</span><span class="key-v">— ±2σ<sub>t</sub></span></div>
-              <p>GARCH(1,1) · simulated data<br>Below: autocorrelation of squared returns.</p>
-              <details class="model-details">
-                <summary>Model &amp; parameters</summary>
-                <p>y<sub>t</sub> = σ<sub>t</sub>z<sub>t</sub>, z<sub>t</sub> ∼ N(0,1)<br>
-                σ<sub>t</sub><sup>2</sup> = ω + αy<sub>t−1</sub><sup>2</sup> + βσ<sub>t−1</sub><sup>2</sup><br>
-                <span id="ts-params"></span>.<br>
-                Dashed lines: ±1.96/√T, a white-noise reference rather than GARCH confidence bands.</p>
-              </details>
-            </figcaption>
-          </figure>
-          <p class="sidebar-note">Quiet periods, then bursts of activity. A small illustration of volatility clustering.</p>
-        </div>
-      </aside>
-    </div>
-    <footer><span>© 2026 Filippo Nardoni</span><a href="#top">Back to top ↑</a></footer>
   </main>
 
   <script>
@@ -610,10 +418,6 @@
 
       document.getElementById('ts-redraw').addEventListener('click', run);
       window.addEventListener('resize', render);
-      if (window.ResizeObserver) {
-        var chartObserver = new ResizeObserver(render);
-        chartObserver.observe(cs.parentElement);
-      }
       if (window.matchMedia) {
         var mq = window.matchMedia('(prefers-color-scheme: dark)');
         if (mq.addEventListener) mq.addEventListener('change', render);
