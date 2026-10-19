@@ -121,6 +121,27 @@
       html { scroll-behavior: auto; }
       .course > summary::before { transition: none; }
     }
+
+    /* Notes controls and narrow-screen layout */
+    [hidden] { display: none !important; }
+    .notes-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 8px 0 12px; }
+    .notes-controls .notes-search { flex: 1 1 260px; min-width: 0; width: auto; margin: 0; }
+    .notes-refresh {
+      font-family: var(--mono); font-size: 0.76rem; line-height: 1.6;
+      padding: 8px 12px; border: 1px solid var(--line); border-radius: 6px;
+      color: var(--text); background: var(--soft); cursor: pointer;
+    }
+    .notes-refresh:hover { border-color: var(--accent); color: var(--accent); }
+    .notes-refresh:disabled { opacity: 0.6; cursor: wait; }
+    #notes-count { margin: 0 0 12px; }
+    #notes-count:empty { display: none; }
+    .note-title { overflow-wrap: anywhere; }
+    .note-list .note-meta { flex-shrink: 0; }
+    @media (max-width: 480px) {
+      .course > summary { flex-wrap: wrap; gap: 4px 8px; }
+      .course > summary .course-name { flex-basis: 65%; }
+      .course > summary .course-meta { margin-left: 22px; }
+    }
   </style>
 </head>
 <body>
@@ -211,19 +232,11 @@
       </div>
     </section>
 
-    <!-- ================= NOTES =================
-         This section fills itself. You never edit this HTML to add a note.
-
-         1. In the repo, make a folder called "notes".
-         2. Inside it, make one folder per course, e.g.
-              notes/Advanced-Financial-Econometrics/
-              notes/Macroeconometrics/
-         3. Upload PDFs into the course folders, e.g.
-              notes/Advanced-Financial-Econometrics/01-GARCH-models-and-QML.pdf
-
-         Folder name  -> course heading   (dashes/underscores become spaces)
-         File name    -> note title       (same; write capitals as you want them shown)
-         A leading number such as "01-" sets the order and is hidden. -->
+    <!-- NOTES: Upload course PDFs beside index.html; cv.pdf is excluded.
+         Optional: use notes/<course>/<filename>.pdf for course groups.
+         Underscores and dashes become spaces; a leading 01- sets the order.
+         No HTML changes are needed when adding PDFs. Use Refresh notes afterwards.
+         Configure exclusions and optional title overrides in the Notes script. -->
     <section id="notes">
       <h2>Lecture Notes</h2>
       <p class="notes-intro">
@@ -231,15 +244,19 @@
         corrections are welcome by email.
       </p>
 
-      <input class="notes-search" type="search" id="notes-search"
-             placeholder="Search notes (e.g. GARCH, bootstrap, cointegration)…"
-             aria-label="Search notes">
+      <div class="notes-controls">
+        <input class="notes-search" type="search" id="notes-search"
+               placeholder="Search notes (e.g. GARCH, bootstrap, cointegration)…"
+               aria-label="Search notes" aria-controls="notes-list" autocomplete="off">
+        <button class="notes-refresh" type="button" id="notes-refresh" aria-controls="notes-list">Refresh notes</button>
+      </div>
+      <p class="note-status" id="notes-count" role="status" aria-live="polite"></p>
 
       <div id="notes-list" aria-live="polite">
         <p class="note-status">Loading notes…</p>
       </div>
       <p class="note-status" id="notes-empty" hidden>No notes match your search.</p>
-      <noscript><p class="note-status">The notes are in the <a href="notes/">notes folder</a> of this site's repository.</p></noscript>
+      <noscript><p class="note-status">Enable JavaScript to search notes, or <a href="https://github.com/Filnard13/Filnard13.github.io">browse the PDFs on GitHub</a>.</p></noscript>
     </section>
 
     <section id="contact">
@@ -409,129 +426,188 @@
       run();
     })();
 
-    /* ---------- Notes: list every PDF under notes/ in the repo ---------- */
+    /* ---------- Notes: root PDFs and PDFs inside notes/ ---------- */
     (function () {
-      // Used when the page is not opened from <username>.github.io (e.g. previewed locally).
-      var OWNER = 'Filnard13', REPO = 'Filnard13.github.io', FOLDER = 'notes';
+      'use strict';
 
-      var host = location.hostname;
-      if (/\.github\.io$/.test(host)) { OWNER = host.split('.')[0]; REPO = host; }
+      // Upload course PDFs beside index.html, or organise them in notes/<course>/.
+      // Use the repository and branch that publish this website.
+      var OWNER = 'Filnard13';
+      var REPO = 'Filnard13.github.io';
+      var REF = 'HEAD';
+      var FOLDER = 'notes';
+      var EXCLUDED_FILES = ['cv.pdf']; // Case-insensitive, repository-relative paths.
+      // Optional: override a displayed title without renaming the PDF.
+      // Example: 'Economics_of_Ex_Rates.pdf': 'Economics of Exchange Rates'
+      var TITLES = {
+        'Economics_of_Ex_Rates.pdf': 'Economics of Exchange Rates'
+      };
 
       var list = document.getElementById('notes-list');
       var input = document.getElementById('notes-search');
       var empty = document.getElementById('notes-empty');
-      if (!list) return;
-      var CACHE = 'notes-tree-v1', TTL = 5 * 60 * 1000;
+      var refresh = document.getElementById('notes-refresh');
+      var count = document.getElementById('notes-count');
+      if (!list || !input || !empty || !refresh || !count) return;
+
+      var repoURL = 'https://github.com/' + encodeURIComponent(OWNER) + '/' + encodeURIComponent(REPO);
+      var numberSort = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+      var groups = [];
 
       function pretty(name) {
-        return name.replace(/\.pdf$/i, '').replace(/^\d+[-_. ]+/, '').replace(/[-_]+/g, ' ').trim();
+        return name.replace(/\.pdf$/i, '').replace(/^\d+[-_. ]+/, '')
+          .replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
       }
-      function byName(a, b) {
-        return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+
+      function fileURL(path) {
+        return path.split('/').map(encodeURIComponent).join('/');
       }
+
+      function collectNotes(tree) {
+        var excluded = new Set(EXCLUDED_FILES.map(function (path) { return path.toLowerCase(); }));
+        return tree.filter(function (entry) {
+          if (entry.type !== 'blob' || !/\.pdf$/i.test(entry.path)) return false;
+          if (excluded.has(entry.path.toLowerCase())) return false;
+          return entry.path.indexOf('/') === -1 || entry.path.indexOf(FOLDER + '/') === 0;
+        }).map(function (entry) {
+          var parts = entry.path.split('/');
+          var filename = parts[parts.length - 1];
+          return {
+            path: entry.path,
+            title: TITLES[entry.path] || pretty(filename),
+            group: parts.length > 2 ? parts.slice(1, -1).map(pretty).join(' / ') : 'Course Notes'
+          };
+        }).sort(function (a, b) {
+          return numberSort.compare(a.group, b.group) || numberSort.compare(a.path, b.path);
+        });
+      }
+
       function el(tag, cls, text) {
-        var e = document.createElement(tag);
-        if (cls) e.className = cls;
-        if (text != null) e.textContent = text;
-        return e;
+        var element = document.createElement(tag);
+        if (cls) element.className = cls;
+        if (text != null) element.textContent = text;
+        return element;
       }
-      function status(text, linkText, href) {
-        list.textContent = '';
-        var p = el('p', 'note-status', text);
-        if (href) { var a = el('a', null, linkText); a.href = href; p.appendChild(a); }
+
+      function showStatus(message, includeLink) {
+        list.replaceChildren();
+        var p = el('p', 'note-status', message);
+        if (includeLink) {
+          p.appendChild(document.createTextNode(' '));
+          var link = el('a', '', 'Browse files on GitHub');
+          link.href = repoURL;
+          p.appendChild(link);
+        }
         list.appendChild(p);
       }
 
-      function fetchPaths() {
-        try {
-          var c = JSON.parse(sessionStorage.getItem(CACHE));
-          if (c && Date.now() - c.at < TTL) return Promise.resolve(c.paths);
-        } catch (e) {}
-        var refs = ['HEAD', 'main', 'master'];
-        function attempt(i) {
-          return fetch('https://api.github.com/repos/' + OWNER + '/' + REPO + '/git/trees/' + refs[i] + '?recursive=1')
-            .then(function (r) {
-              if (r.ok) return r.json();
-              if (i + 1 < refs.length) return attempt(i + 1);
-              throw new Error('GitHub API ' + r.status);
-            });
-        }
-        return attempt(0).then(function (data) {
-          var paths = (data.tree || [])
-            .filter(function (n) {
-              return n.type === 'blob' && n.path.indexOf(FOLDER + '/') === 0 && /\.pdf$/i.test(n.path);
-            })
-            .map(function (n) { return n.path; });
-          try { sessionStorage.setItem(CACHE, JSON.stringify({ at: Date.now(), paths: paths })); } catch (e) {}
-          return paths;
+      function filter() {
+        var query = input.value.trim().toLocaleLowerCase();
+        var visible = 0;
+        var total = 0;
+        groups.forEach(function (group) {
+          var matches = 0;
+          group.rows.forEach(function (row) {
+            var hit = !query || row.search.indexOf(query) !== -1;
+            row.element.hidden = !hit;
+            if (hit) matches++;
+          });
+          group.element.hidden = matches === 0;
+          // Preserve which courses the visitor had open before searching.
+          if (query && !group.searching) group.wasOpen = group.element.open;
+          if (query && matches) group.element.open = true;
+          if (!query && group.searching) group.element.open = group.wasOpen;
+          group.searching = Boolean(query);
+          group.meta.textContent = matches + (matches === 1 ? ' note' : ' notes');
+          visible += matches;
+          total += group.rows.length;
         });
+        count.textContent = query ? visible + ' of ' + total + ' notes' : total + (total === 1 ? ' note' : ' notes');
+        empty.hidden = !query || visible > 0 || total === 0;
       }
 
-      function render(paths) {
-        if (!paths.length) {
-          status('No notes yet. PDFs uploaded to the ' + FOLDER + '/ folder of the repository appear here automatically.');
+      function render(notes) {
+        groups = [];
+        list.replaceChildren();
+        if (!notes.length) {
+          showStatus('No note PDFs found. Upload them beside index.html or inside notes/.', true);
+          filter();
           return;
         }
-        var groups = {};
-        paths.forEach(function (p) {
-          var parts = p.split('/').slice(1);
-          var course = parts.length > 1 ? parts[0] : 'General';
-          (groups[course] = groups[course] || []).push(p);
+        var byCourse = new Map();
+        notes.forEach(function (note) {
+          if (!byCourse.has(note.group)) byCourse.set(note.group, []);
+          byCourse.get(note.group).push(note);
         });
-
-        list.textContent = '';
-        Object.keys(groups).sort(byName).forEach(function (course, idx) {
-          var files = groups[course].sort(byName);
-          var d = el('details', 'course');
-          if (idx === 0) d.open = true;
-          var s = el('summary');
-          s.appendChild(el('span', 'course-name', pretty(course)));
-          s.appendChild(el('span', 'course-meta', files.length + (files.length === 1 ? ' note' : ' notes')));
-          d.appendChild(s);
-
+        byCourse.forEach(function (files, name) {
+          var details = el('details', 'course');
+          details.open = groups.length === 0;
+          var summary = el('summary');
+          var meta = el('span', 'course-meta');
+          summary.appendChild(el('span', 'course-name', name));
+          summary.appendChild(meta);
+          details.appendChild(summary);
           var ul = el('ul', 'note-list');
-          files.forEach(function (p) {
+          var group = { element: details, meta: meta, rows: [], searching: false };
+          files.forEach(function (note) {
             var li = el('li');
-            li.appendChild(el('span', 'note-title', pretty(p.split('/').pop())));
-            var meta = el('span', 'note-meta');
-            var a = el('a', null, 'PDF');
-            a.href = p.split('/').map(encodeURIComponent).join('/');
-            meta.appendChild(a);
-            li.appendChild(meta);
+            var link = el('a', 'note-title', note.title);
+            link.href = fileURL(note.path);
+            li.appendChild(link);
+            li.appendChild(el('span', 'note-meta', 'PDF'));
             ul.appendChild(li);
+            group.rows.push({ element: li, search: (name + ' ' + note.title + ' ' + note.path).toLocaleLowerCase() });
           });
-          d.appendChild(ul);
-          list.appendChild(d);
+          details.appendChild(ul);
+          list.appendChild(details);
+          groups.push(group);
         });
         filter();
       }
 
-      // Search: filters by note title and course name.
-      function filter() {
-        var courses = list.querySelectorAll('.course');
-        if (!courses.length) { empty.hidden = true; return; }
-        var q = input.value.trim().toLowerCase(), any = false;
-        courses.forEach(function (course) {
-          var name = course.querySelector('.course-name').textContent.toLowerCase();
-          var n = 0;
-          course.querySelectorAll('.note-list li').forEach(function (li) {
-            var hit = !q || name.indexOf(q) !== -1 || li.textContent.toLowerCase().indexOf(q) !== -1;
-            li.style.display = hit ? '' : 'none';
-            if (hit) n++;
-          });
-          course.style.display = n ? '' : 'none';
-          if (q && n) course.open = true;
-          if (n) any = true;
-        });
-        empty.hidden = any;
+      async function loadNotes() {
+        refresh.disabled = true;
+        refresh.textContent = 'Loading…';
+        list.setAttribute('aria-busy', 'true');
+        empty.hidden = true;
+        var controller = new AbortController();
+        var timeout = setTimeout(function () { controller.abort(); }, 15000);
+        try {
+          // Always fetch a fresh tree: newly uploaded PDFs appear after Refresh notes.
+          var response = await fetch('https://api.github.com/repos/' + encodeURIComponent(OWNER) + '/' +
+            encodeURIComponent(REPO) + '/git/trees/' + encodeURIComponent(REF) + '?recursive=1', {
+              signal: controller.signal,
+              cache: 'no-store',
+              headers: { Accept: 'application/vnd.github+json' }
+            });
+          if (!response.ok) throw new Error(response.status === 403 || response.status === 429 ? 'rate-limit' : 'http');
+          var data = await response.json();
+          if (!Array.isArray(data.tree) || data.truncated) throw new Error('incomplete');
+          render(collectNotes(data.tree));
+        } catch (error) {
+          if (groups.length) {
+            // Keep usable links if a later refresh fails.
+            filter();
+            count.textContent += ' · Refresh failed; try again later.';
+          } else {
+            count.textContent = '';
+            showStatus(error.message === 'rate-limit' ?
+              'GitHub is temporarily limiting requests. Try Refresh notes later.' :
+              'The notes could not be loaded. Check your connection and try Refresh notes.', true);
+          }
+        } finally {
+          clearTimeout(timeout);
+          list.setAttribute('aria-busy', 'false');
+          refresh.disabled = false;
+          refresh.textContent = 'Refresh notes';
+        }
       }
-      if (input) input.addEventListener('input', filter);
 
-      fetchPaths().then(render).catch(function () {
-        status('The list could not be loaded right now. ', 'Browse the notes on GitHub',
-               'https://github.com/' + OWNER + '/' + REPO + '/tree/HEAD/' + FOLDER);
-      });
+      input.addEventListener('input', filter);
+      refresh.addEventListener('click', loadNotes);
+      loadNotes();
     })();
+
   </script>
 
 </body>
